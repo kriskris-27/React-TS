@@ -1,17 +1,19 @@
 import React from 'react'
 import WelcomeMessage from './components/WelcomeMessage'
-import Greeting from './components/Greeting'
-import ProductCard from './components/ProductCard'
-import UserProfile from './components/UserProfile'
+// import Greeting from './components/Greeting'
+// import ProductCard from './components/ProductCard'
+// import UserProfile from './components/UserProfile'
+import Counter from './components/Counter'
 
 const App = () => {
   return (
     <>
     <WelcomeMessage/>
-    <Greeting name="kris"/>
+    {/* <Greeting name="kris"/>
     <ProductCard productName='porsche' price='100000'/>
     <UserProfile username="kris" age={20} />
-    <UserProfile username="Lewis"/>
+    <UserProfile username="Lewis"/> */}
+    <Counter/>
      </>
   )
 }
