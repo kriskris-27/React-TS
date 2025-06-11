@@ -1,25 +1,27 @@
 import React from 'react'
 import WelcomeMessage from './components/WelcomeMessage'
+import DataFetcher from './components/DataFetcher'
 // import Greeting from './components/Greeting'
 // import ProductCard from './components/ProductCard'
 // import UserProfile from './components/UserProfile'
 // import Counter from './components/Counter'
-import Nameinput from './components/Nameinput'
-import CustomButton from './components/CustomButton'
+// import Nameinput from './components/Nameinput'
+// import CustomButton from './components/CustomButton'
 
 const App = () => {
   return (
     <>
     <WelcomeMessage/>
+
     {/* <Greeting name="kris"/>
     <ProductCard productName='porsche' price='100000'/>
     <UserProfile username="kris" age={20} />
     <UserProfile username="Lewis"/> */}
     {/* <Counter/> */}
-    <Nameinput/>
-    <CustomButton onbtnpress={()=> alert('Button Clicked')}>Hello</CustomButton>
-    <CustomButton onbtnpress={() => console.log('Icon button pressed.')}>
-            {/* Example of using a simple SVG as an icon for demonstration */}
+    {/* <Nameinput/> */}
+    {/* <CustomButton onbtnpress={()=> alert('Button Clicked')}>Hello</CustomButton> */}
+    {/* <CustomButton onbtnpress={() => console.log('Icon button pressed.')}>
+            
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-5 w-5 mr-2"
@@ -33,7 +35,10 @@ const App = () => {
               />
             </svg>
             <span>Download</span>
-          </CustomButton>
+          </CustomButton> */}
+
+          <DataFetcher/>
+
      </>
   )
 }
