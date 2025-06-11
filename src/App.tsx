@@ -1,6 +1,6 @@
 import React from 'react'
 import WelcomeMessage from './components/WelcomeMessage'
-import DataFetcher from './components/DataFetcher'
+// import DataFetcher from './components/DataFetcher'
 import UserDetailFetcher from './components/UserDetailFetcher'
 // import Greeting from './components/Greeting'
 // import ProductCard from './components/ProductCard'

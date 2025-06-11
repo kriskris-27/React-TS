@@ -16,7 +16,7 @@ const UserDetailFetcher = () => {
             setLoading(true)
             setError(null)
             try{
-                const resp = await fetch("https://jsonplaceholder.typicode.com/users/999")
+                const resp = await fetch("https://jsonplaceholder.typicode.com/users/1")
 
                 if(!resp.ok){
                     throw new Error(`HTTP error! status: ${resp.status}`)
