@@ -20,12 +20,14 @@ useEffect((
     }
     else{
         setErrorpassword('')
-        
+
     }
     
     if(email.includes('@') && password.length >= 6){
         setIndi(true)
         setErrorpassword('Ready to login')
+    }else{
+        setIndi(false)
     }
 
 },[email,password])
