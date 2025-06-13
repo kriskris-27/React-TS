@@ -3,6 +3,7 @@ import WelcomeMessage from './components/WelcomeMessage'
 // import DataFetcher from './components/DataFetcher'
 // import UserDetailFetcher from './components/UserDetailFetcher'
 import RegistrationForm from './components/RegistrationForm'
+import DebouncedSearchInput from './components/DebouncedSearchInput'
 // import Greeting from './components/Greeting'
 // import ProductCard from './components/ProductCard'
 // import UserProfile from './components/UserProfile'
@@ -43,8 +44,9 @@ const App = () => {
 
           {/* <UserDetailFetcher/> */}
 
-          <RegistrationForm/>
+          {/* <RegistrationForm/> */}
 
+        <DebouncedSearchInput/>
      </>
   )
 }
