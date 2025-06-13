@@ -82,7 +82,7 @@ const DebouncedSearchInput = () => {
         
     </ul>
 
-    
+    <p>{error && (error)}</p>
     </>
   )
 }
