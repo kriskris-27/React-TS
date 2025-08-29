@@ -6,6 +6,7 @@ import { useState } from "react"
 
 export  const Todomain = () => {
     const [todos , setTodos] = useState<Data[]>(Tododata)
+    const [inp,setInp] = useState<string>("")
 
     const toggletodo =(id:number)=>{
         setTodos((prev)=>
@@ -15,9 +16,23 @@ export  const Todomain = () => {
         )
     }
 
+    const addValue = () =>{
+        
+        if(!inp.trim())  return;
+        const temp = {
+            id:Date.now(),
+            title:inp,
+            completed:false
+        }
+        setTodos([...todos,temp])
+        setInp('')
+    }
+
 
   return (
     <>
+    <input placeholder="Enter the task"  value={inp} onChange={(e)=>setInp(e.target.value)} />
+    <button type="submit" onClick={addValue}>Add</button>
         <ul>
             {todos && todos.map((todo)=>(
                 <li onClick={()=>toggletodo(todo.id)} key={todo.id}
