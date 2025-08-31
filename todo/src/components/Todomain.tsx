@@ -7,7 +7,7 @@ import { useState } from "react"
 export  const Todomain = () => {
     const [todos , setTodos] = useState<Data[]>(Tododata);
     const [inp,setInp] = useState<string>("");
-    const [editingId,setEditingId]  = useState<number>();
+    const [editingId,setEditingId]  = useState<number | null>();
     const [edittext,setEdittext] = useState<string>("");
 
     const toggletodo =(id:number)=>{
@@ -28,6 +28,21 @@ export  const Todomain = () => {
         }
         setTodos([...todos,temp])
         setInp('')
+                console.log(todos);
+
+    }
+
+    const saveText = () =>{
+        if(!edittext.trim()) return
+        setTodos(todos.map((todo)=>(todo.id==editingId ? {...todo,title:edittext}:todo)))
+        setEditingId(null)
+        setEdittext('')
+        
+    }
+
+    const cancelEdit = () =>{
+        setEditingId(null)
+        setEdittext('')
     }
 
     
@@ -45,8 +60,8 @@ export  const Todomain = () => {
                     <>
                     <input placeholder="Start editing..." value={edittext} onChange={(e)=>setEdittext(e.target.value)} className="border border-gray-300"/>
 
-                     <button >Save</button>
-                     <button>Cancel</button>
+                     <button onClick={saveText} type="submit" className="bg-blue-500 text-white py-2 px-4 rounded-full">Save</button>
+                     <button onClick={cancelEdit} className="bg-blue-500 text-white py-2 px-4 rounded-full">Cancel</button>
                     
                      </>
                     )
@@ -56,7 +71,7 @@ export  const Todomain = () => {
                      <span onClick={()=>toggletodo(todo.id)}>
                     {todo.title}
                     </span>
-                    <button onClick={()=>setEditingId(todo.id)}>Edit</button>
+                    <button onClick={()=>{setEditingId(todo.id); setEdittext(todo.title); } } className="bg-blue-500 text-white py-2 px-4 rounded-full">Edit</button>
                     </>
                     )
                     }
