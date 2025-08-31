@@ -5,8 +5,10 @@ import { useState } from "react"
 
 
 export  const Todomain = () => {
-    const [todos , setTodos] = useState<Data[]>(Tododata)
-    const [inp,setInp] = useState<string>("")
+    const [todos , setTodos] = useState<Data[]>(Tododata);
+    const [inp,setInp] = useState<string>("");
+    const [editingId,setEditingId]  = useState<number>();
+    const [edittext,setEdittext] = useState<string>("");
 
     const toggletodo =(id:number)=>{
         setTodos((prev)=>
@@ -28,16 +30,36 @@ export  const Todomain = () => {
         setInp('')
     }
 
-
+    
   return (
     <>
-    <input placeholder="Enter the task"  value={inp} onChange={(e)=>setInp(e.target.value)} />
+    <input placeholder="Enter the task"  value={inp} onChange={(e)=>setInp(e.target.value)} className="border border-gray-300" />
     <button type="submit" onClick={addValue}>Add</button>
         <ul>
             {todos && todos.map((todo)=>(
-                <li onClick={()=>toggletodo(todo.id)} key={todo.id}
+                
+                <li  key={todo.id}
                 style={{textDecoration : todo.completed ? "line-through" : "none",cursor:"pointer"}}>
+
+                    {editingId === todo.id ? (
+                    <>
+                    <input placeholder="Start editing..." value={edittext} onChange={(e)=>setEdittext(e.target.value)} className="border border-gray-300"/>
+
+                     <button >Save</button>
+                     <button>Cancel</button>
+                    
+                     </>
+                    )
+                    :
+                    (
+                    <>
+                     <span onClick={()=>toggletodo(todo.id)}>
                     {todo.title}
+                    </span>
+                    <button onClick={()=>setEditingId(todo.id)}>Edit</button>
+                    </>
+                    )
+                    }
                 </li>
                 ))}
         </ul>
