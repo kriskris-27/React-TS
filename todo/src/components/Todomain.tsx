@@ -1,12 +1,25 @@
 import type Data from "../types/Todotype"
-import { Tododata } from "../services/Tododata"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 export const Todomain = () => {
-  const [todos, setTodos] = useState<Data[]>(Tododata);
-  const [inp, setInp] = useState<string>("");
-  const [editingId, setEditingId] = useState<number | null>(null);
-  const [edittext, setEdittext] = useState<string>("");
+  const [todos, setTodos] = useState<Data[]>([])
+  const [inp, setInp] = useState<string>("")
+  const [priority, setPriority] = useState<"low" | "medium" | "high">("low")
+  const [editingId, setEditingId] = useState<number | null>(null)
+  const [edittext, setEdittext] = useState<string>("")
+  const [filter, setFilter] = useState<"all" | "active" | "completed">("all")
+  const [search, setSearch] = useState<string>("")
+
+  // ✅ load from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem("todos")
+    if (saved) setTodos(JSON.parse(saved))
+  }, [])
+
+  // ✅ save to localStorage
+  useEffect(() => {
+    localStorage.setItem("todos", JSON.stringify(todos))
+  }, [todos])
 
   // ✅ toggle todo
   const toggletodo = (id: number) => {
@@ -24,37 +37,64 @@ export const Todomain = () => {
 
   // ✅ add todo
   const addValue = () => {
-    if (!inp.trim()) return;
+    if (!inp.trim()) return
     const temp = {
       id: Date.now(),
       title: inp,
-      completed: false
+      completed: false,
+      priority
     }
     setTodos([...todos, temp])
-    setInp('')
+    setInp("")
+    setPriority("low")
   }
 
   // ✅ save edited todo
   const saveText = () => {
     if (!edittext.trim()) return
-    setTodos(todos.map((todo) =>
-      todo.id === editingId ? { ...todo, title: edittext } : todo
-    ))
+    setTodos(
+      todos.map((todo) =>
+        todo.id === editingId ? { ...todo, title: edittext } : todo
+      )
+    )
     setEditingId(null)
-    setEdittext('')
+    setEdittext("")
   }
 
   // ✅ cancel editing
   const cancelEdit = () => {
     setEditingId(null)
-    setEdittext('')
+    setEdittext("")
   }
 
-  return (
-    <div className="max-w-lg mx-auto mt-10 p-6 bg-white shadow-lg rounded-2xl">
-      <h1 className="text-2xl font-bold mb-4 text-center text-gray-800">📋 Todo List</h1>
+  // ✅ mark all completed
+  const markAllCompleted = () => {
+    setTodos(todos.map((todo) => ({ ...todo, completed: true })))
+  }
 
-      {/* input + button */}
+  // ✅ clear completed
+  const clearCompleted = () => {
+    setTodos(todos.filter((todo) => !todo.completed))
+  }
+
+  // ✅ filter + search
+  const filteredTodos = todos.filter((todo) => {
+    if (filter === "active") return !todo.completed
+    if (filter === "completed") return todo.completed
+    return true
+  })
+
+  const searchedTodos = filteredTodos.filter((todo) =>
+    todo.title.toLowerCase().includes(search.toLowerCase())
+  )
+
+  return (
+    <div className="max-w-xl mx-auto mt-10 p-6 bg-white shadow-lg rounded-2xl">
+      <h1 className="text-2xl font-bold mb-4 text-center text-gray-800">
+        📋 Todo List
+      </h1>
+
+      {/* input + priority + button */}
       <div className="flex gap-2 mb-4">
         <input
           placeholder="Enter the task"
@@ -62,6 +102,19 @@ export const Todomain = () => {
           onChange={(e) => setInp(e.target.value)}
           className="flex-1 border border-gray-300 px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
+
+        <select
+          value={priority}
+          onChange={(e) =>
+            setPriority(e.target.value as "low" | "medium" | "high")
+          }
+          className="border border-gray-300 px-2 py-2 rounded-lg"
+        >
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+        </select>
+
         <button
           type="submit"
           onClick={addValue}
@@ -71,9 +124,45 @@ export const Todomain = () => {
         </button>
       </div>
 
+      {/* search box */}
+      <input
+        placeholder="🔍 Search tasks..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        className="w-full border border-gray-300 px-3 py-2 rounded-lg mb-3 focus:outline-none focus:ring-2 focus:ring-blue-400"
+      />
+
+      {/* filter buttons */}
+      <div className="flex justify-center gap-3 mb-4">
+        <button
+          onClick={() => setFilter("all")}
+          className={`px-3 py-1 rounded-lg text-white ${
+            filter === "all" ? "bg-blue-600" : "bg-gray-500"
+          }`}
+        >
+          All
+        </button>
+        <button
+          onClick={() => setFilter("active")}
+          className={`px-3 py-1 rounded-lg text-white ${
+            filter === "active" ? "bg-blue-600" : "bg-gray-500"
+          }`}
+        >
+          Active
+        </button>
+        <button
+          onClick={() => setFilter("completed")}
+          className={`px-3 py-1 rounded-lg text-white ${
+            filter === "completed" ? "bg-blue-600" : "bg-gray-500"
+          }`}
+        >
+          Completed
+        </button>
+      </div>
+
       {/* todos list */}
       <ul className="space-y-3">
-        {todos && todos.map((todo) => (
+        {searchedTodos.map((todo) => (
           <li
             key={todo.id}
             className="flex items-center justify-between bg-gray-50 p-3 rounded-lg shadow-sm hover:shadow-md transition"
@@ -106,14 +195,34 @@ export const Todomain = () => {
               <>
                 <span
                   onClick={() => toggletodo(todo.id)}
-                  className={`flex-1 cursor-pointer ${todo.completed ? "line-through text-gray-400" : "text-gray-800"}`}
+                  className={`flex-1 cursor-pointer ${
+                    todo.completed
+                      ? "line-through text-gray-400"
+                      : "text-gray-800"
+                  }`}
                 >
                   {todo.title}
                 </span>
 
+                {/* priority badge */}
+                <span
+                  className={`px-2 py-1 rounded text-xs font-bold mr-3 ${
+                    todo.priority === "high"
+                      ? "bg-red-200 text-red-800"
+                      : todo.priority === "medium"
+                      ? "bg-yellow-200 text-yellow-800"
+                      : "bg-green-200 text-green-800"
+                  }`}
+                >
+                  {todo.priority}
+                </span>
+
                 <div className="flex gap-2">
                   <button
-                    onClick={() => { setEditingId(todo.id); setEdittext(todo.title); }}
+                    onClick={() => {
+                      setEditingId(todo.id)
+                      setEdittext(todo.title)
+                    }}
                     className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg"
                   >
                     Edit
@@ -131,6 +240,22 @@ export const Todomain = () => {
           </li>
         ))}
       </ul>
+
+      {/* footer actions */}
+      <div className="flex justify-between mt-6">
+        <button
+          onClick={markAllCompleted}
+          className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg"
+        >
+          Mark All Completed
+        </button>
+        <button
+          onClick={clearCompleted}
+          className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg"
+        >
+          Clear Completed
+        </button>
+      </div>
     </div>
   )
 }
