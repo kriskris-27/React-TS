@@ -1,19 +1,25 @@
-import type Data from "../types/Todotype"
+import type { Data } from "../types/Todotype"
 import { useState, useEffect } from "react"
 
 export const Todomain = () => {
   const [todos, setTodos] = useState<Data[]>([])
-  const [inp, setInp] = useState<string>("")
+  const [inp, setInp] = useState("")
   const [priority, setPriority] = useState<"low" | "medium" | "high">("low")
   const [editingId, setEditingId] = useState<number | null>(null)
-  const [edittext, setEdittext] = useState<string>("")
+  const [edittext, setEdittext] = useState("")
   const [filter, setFilter] = useState<"all" | "active" | "completed">("all")
-  const [search, setSearch] = useState<string>("")
+  const [search, setSearch] = useState("")
 
   // ✅ load from localStorage
   useEffect(() => {
     const saved = localStorage.getItem("todos")
-    if (saved) setTodos(JSON.parse(saved))
+    if (saved) {
+      try {
+        setTodos(JSON.parse(saved))
+      } catch {
+        console.error("Invalid todos in localStorage")
+      }
+    }
   }, [])
 
   // ✅ save to localStorage
@@ -32,29 +38,33 @@ export const Todomain = () => {
 
   // ✅ delete todo
   const todoDelete = (id: number) => {
-    setTodos(todos.filter((todo) => todo.id !== id))
+    setTodos((prev) => prev.filter((todo) => todo.id !== id))
+    if (editingId === id) {
+      setEditingId(null)
+      setEdittext("")
+    }
   }
 
   // ✅ add todo
   const addValue = () => {
     if (!inp.trim()) return
-    const temp = {
-      id: Date.now(),
-      title: inp,
+    const temp: Data = {
+      id: crypto.randomUUID ? Number.parseInt(crypto.randomUUID().slice(-6), 16) : Date.now(), // ✅ safer than Date.now alone
+      title: inp.trim(),
       completed: false,
       priority
     }
-    setTodos([...todos, temp])
+    setTodos((prev) => [...prev, temp])
     setInp("")
     setPriority("low")
   }
 
   // ✅ save edited todo
   const saveText = () => {
-    if (!edittext.trim()) return
-    setTodos(
-      todos.map((todo) =>
-        todo.id === editingId ? { ...todo, title: edittext } : todo
+    if (!edittext.trim() || editingId === null) return
+    setTodos((prev) =>
+      prev.map((todo) =>
+        todo.id === editingId ? { ...todo, title: edittext.trim() } : todo
       )
     )
     setEditingId(null)
@@ -69,12 +79,12 @@ export const Todomain = () => {
 
   // ✅ mark all completed
   const markAllCompleted = () => {
-    setTodos(todos.map((todo) => ({ ...todo, completed: true })))
+    setTodos((prev) => prev.map((todo) => ({ ...todo, completed: true })))
   }
 
   // ✅ clear completed
   const clearCompleted = () => {
-    setTodos(todos.filter((todo) => !todo.completed))
+    setTodos((prev) => prev.filter((todo) => !todo.completed))
   }
 
   // ✅ filter + search
@@ -134,30 +144,17 @@ export const Todomain = () => {
 
       {/* filter buttons */}
       <div className="flex justify-center gap-3 mb-4">
-        <button
-          onClick={() => setFilter("all")}
-          className={`px-3 py-1 rounded-lg text-white ${
-            filter === "all" ? "bg-blue-600" : "bg-gray-500"
-          }`}
-        >
-          All
-        </button>
-        <button
-          onClick={() => setFilter("active")}
-          className={`px-3 py-1 rounded-lg text-white ${
-            filter === "active" ? "bg-blue-600" : "bg-gray-500"
-          }`}
-        >
-          Active
-        </button>
-        <button
-          onClick={() => setFilter("completed")}
-          className={`px-3 py-1 rounded-lg text-white ${
-            filter === "completed" ? "bg-blue-600" : "bg-gray-500"
-          }`}
-        >
-          Completed
-        </button>
+        {["all", "active", "completed"].map((f) => (
+          <button
+            key={f}
+            onClick={() => setFilter(f as "all" | "active" | "completed")}
+            className={`px-3 py-1 rounded-lg text-white ${
+              filter === f ? "bg-blue-600" : "bg-gray-500"
+            }`}
+          >
+            {f[0].toUpperCase() + f.slice(1)}
+          </button>
+        ))}
       </div>
 
       {/* todos list */}
@@ -175,7 +172,6 @@ export const Todomain = () => {
                   onChange={(e) => setEdittext(e.target.value)}
                   className="flex-1 border border-gray-300 px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
                 />
-
                 <button
                   onClick={saveText}
                   type="submit"
@@ -183,7 +179,6 @@ export const Todomain = () => {
                 >
                   Save
                 </button>
-
                 <button
                   onClick={cancelEdit}
                   className="bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded-lg"
@@ -227,7 +222,6 @@ export const Todomain = () => {
                   >
                     Edit
                   </button>
-
                   <button
                     onClick={() => todoDelete(todo.id)}
                     className="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg"
